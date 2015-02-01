@@ -2,59 +2,60 @@
 
 echo "Setup variables."
 export DEBIAN_FRONTEND=noninteractive
-export LANGUAGE=$lang
-export LANG=$lang
-export LC_ALL=$lang
-locale-gen $lang
-dpkg-reconfigure locales
-update-locale LANG="$lang" LC_MESSAGES=POSIX
 echo $timezone > /etc/timezone
 . /vagrant/.vagrant_bootstrap/bootstrap.cfg
 
 echo "mysql-server mysql-server/root_password password $mysql_password" | debconf-set-selections
 echo "mysql-server mysql-server/root_password_again password $mysql_password" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/dbconfig-install boolean false" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/mysql/admin-pass password $mysql_password" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/password-confirm password $mysql_password" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/setup-password password $mysql_password" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/database-type select mysql" | debconf-set-selections
-echo "phpmyadmin phpmyadmin/database-type select mysql" | debconf-set-selections
 
 echo "Refresh repositories."
+sudo apt-key update
 sudo apt-get upgrade -y
 sudo apt-get update -y
-
-echo "Add repositories."
-
-sudo add-apt-repository -y ppa:ondrej/php5-5.6
-sudo add-apt-repository -y ppa:ondrej/apache2
-sudo add-apt-repository -y ppa:ondrej/mysql-5.6
-
-
-echo "Update repositories."
-sudo apt-get update
-
 
 echo "Installing base staff." 
 sudo apt-get install -y vim tmux curl wget build-essential python-software-properties git-core unzip curl acl ruby memcached debconf-utils checkinstall zip locate ruby-full libsqlite3-dev
 
+echo "Setup Apache2."
+sudo apt-get install -y apache2
+echo "ServerName localhost" >> /etc/apache2/apache2.conf
+VHOST=$(cat <<EOF
+<VirtualHost *:80>
+  DocumentRoot "/var/www"
+  ServerName localhost
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  <Directory "/var/www">
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>
+EOF
+)
+echo "${VHOST}" > /etc/apache2/sites-enabled/000-default.conf
+usermod -a -G vagrant www-data
+sudo a2enmod rewrite
+sudo a2enmod expires
+sudo a2enmod headers
+sudo service apache2 restart
+
+echo "Add repositories."
+sudo add-apt-repository -y ppa:ondrej/php5-5.6
+sudo add-apt-repository -y ppa:ondrej/apache2
+sudo add-apt-repository -y ppa:ondrej/mysql-5.6
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C
+
+echo "Update repositories."
+sudo apt-get update
+sudo apt-get upgrade
 echo "Setup GIT."
 sudo apt-get install -y git
 git config --global color.branch auto
 git config --global color.diff auto
 git config --global color.status auto
 
-echo "Setup Apache2."
-sudo apt-get install -y apache2
-echo "ServerName localhost" >> /etc/apache2/apache2.conf
-usermod -a -G vagrant www-data
-sudo a2enmod rewrite
-sudo a2enmod expires
-sudo a2enmod headers
-
 echo "Setup PHP 5."
-sudo apt-get install -y php5 php5-gd  php5-geoip php5-redis php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php-pear php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json
+sudo apt-get install -y php5 php5-gd php5-sqlite php5-common php5-geoip php5-redis php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php-pear php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json
 sudo mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.bak
 sudo cp -s /usr/share/php5/php.ini-development /etc/php5/apache2/php.ini
 sed -i 's#;date.timezone\([[:space:]]*\)=\([[:space:]]*\)*#date.timezone\1=\2\"'"$timezone"'\"#g' /etc/php5/apache2/php.ini
@@ -62,7 +63,8 @@ sed -i 's#;date.timezone\([[:space:]]*\)=\([[:space:]]*\)*#date.timezone\1=\2\"'
 sed -i 's#display_errors = Off#display_errors = On#g' /etc/php5/apache2/php.ini
 sed -i 's#display_startup_errors = Off#display_startup_errors = On#g' /etc/php5/apache2/php.ini
 sed -i 's#error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT#error_reporting = E_ALL#g' /etc/php5/apache2/php.ini
-echo "<?php phpinfo(); " > /var/www/index.php
+sudo rm -rf /var/www/html/index*
+echo "<?php phpinfo(); " > /var/www/html/index.php
 sudo a2enmod php5
 
 echo "Configure XDdebug."
@@ -108,13 +110,6 @@ if [ ! -f /usr/share/adminer/adminer.php ];
     sudo ln -s /usr/share/adminer/latest.php /usr/share/adminer/adminer.php
     echo "Alias /adminer.php /usr/share/adminer/adminer.php" | sudo tee /etc/apache2/conf-available/adminer.conf
     sudo a2enconf adminer
-fi
-
-
-echo "Setup PhpMyAdmin."
-if [ ! -f /etc/phpmyadmin/config.inc.php ];
-  then
-   sudo apt-get -y install phpmyadmin
 fi
 
 echo "Setup PEAR."

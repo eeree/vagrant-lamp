@@ -2,10 +2,13 @@
 
 echo "Setup variables."
 export DEBIAN_FRONTEND=noninteractive
+export LANGUAGE=$lang
+export LANG=$lang
+export LC_ALL=$lang
 locale-gen $lang
+dpkg-reconfigure locales
 update-locale LANG="$lang" LC_MESSAGES=POSIX
 echo $timezone > /etc/timezone
-usermod -a -G vagrant www-data
 . /vagrant/.vagrant_bootstrap/bootstrap.cfg
 
 echo "mysql-server mysql-server/root_password password $mysql_password" | debconf-set-selections
@@ -17,6 +20,10 @@ echo "phpmyadmin phpmyadmin/password-confirm password $mysql_password" | debconf
 echo "phpmyadmin phpmyadmin/setup-password password $mysql_password" | debconf-set-selections
 echo "phpmyadmin phpmyadmin/database-type select mysql" | debconf-set-selections
 echo "phpmyadmin phpmyadmin/database-type select mysql" | debconf-set-selections
+
+echo "Refresh repositories."
+sudo apt-get upgrade -y
+sudo apt-get update -y
 
 echo "Add repositories."
 
@@ -41,6 +48,7 @@ git config --global color.status auto
 echo "Setup Apache2."
 sudo apt-get install -y apache2
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
+usermod -a -G vagrant www-data
 sudo a2enmod rewrite
 sudo a2enmod expires
 sudo a2enmod headers
@@ -77,7 +85,7 @@ EOF
 
 echo "Setup Composer."
 
-if [ ! -f /etc/phpmyadmin/config.inc.php ];
+if [ ! -f /usr/local/bin/composer ];
   then
     curl -sS https://getcomposer.org/installer | php
     sudo mv composer.phar /usr/local/bin/composer
@@ -93,7 +101,7 @@ sudo apt-get install -y mysql-server-5.6 mysql-client-5.6
 mysql -u root -proot -e 'CREATE DATABASE IF NOT EXISTS dev'
 
 echo "Setup Adminer."
-if [ ! -f /etc/phpmyadmin/config.inc.php ];
+if [ ! -f /usr/share/adminer/adminer.php ];
   then
     sudo mkdir /usr/share/adminer
     sudo wget -O /usr/share/adminer/latest.php "http://www.adminer.org/latest.php"
@@ -103,7 +111,7 @@ if [ ! -f /etc/phpmyadmin/config.inc.php ];
 fi
 
 
-echo "Setup PhpMyAdmin."# If phpmyadmin does not exist, install it
+echo "Setup PhpMyAdmin."
 if [ ! -f /etc/phpmyadmin/config.inc.php ];
   then
    sudo apt-get -y install phpmyadmin
@@ -133,6 +141,5 @@ fi
 echo "Restart Apache2."
 sudo service apache2 restart
 
-sudo apt-get upgrade -y
 sudo apt-get autoremove -y
 sudo apt-get autoclean -y

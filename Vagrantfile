@@ -26,6 +26,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "private_network", ip: "192.168.56.101"
 
   config.vm.synced_folder "C:/www", "/var/www/"
-  config.vm.synced_folder ".apache_vhosts", "/etc/apache2/sites-available"
 
 end

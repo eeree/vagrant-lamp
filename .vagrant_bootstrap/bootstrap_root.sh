@@ -26,7 +26,7 @@ apt-get update -y -qq
 
 
 echo "[BOOTSTRAP] Installing core packages..." 
-apt-get install -y -qq vim tmux curl wget build-essential make openssl python-software-properties zsh git-core unzip tree curl acl ruby memcached debconf-utils checkinstall zip locate ruby-full libsqlite3-dev  tzdata
+apt-get install -y -qq vim tmux curl wget libmagickwand-dev libmagickcore-dev imagemagick build-essential make openssl python-software-properties zsh git-core unzip tree curl acl ruby memcached debconf-utils checkinstall zip locate ruby-full libsqlite3-dev  tzdata
 
 
 echo "[BOOTSTRAP] Setting up timezone..."
@@ -109,7 +109,7 @@ service apache2 restart
 ########
 
 echo "Setup PHP 5."
-apt-get install -y -qq php5 php5-gd php5-sqlite php5-pgsql php5-ldap php5-common php5-geoip php5-redis php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php-pear php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json php5-xdebug
+apt-get install -y -qq php5 php5-gd php5-sqlite php5-pgsql php5-ldap php5-common php5-geoip php5-redis php5-imagick php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php-pear php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json php5-xdebug
 mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.bak
 cp -s /usr/share/php5/php.ini-development /etc/php5/apache2/php.ini
 sed -i 's#;date.timezone\([[:space:]]*\)=\([[:space:]]*\)*#date.timezone\1=\2\"'"$timezone"'\"#g' /etc/php5/apache2/php.ini
@@ -183,7 +183,8 @@ mysql -u root -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DEFAULT_DATAB
 
 
 echo "[BOOTSTRAP] Restarting MySQL..."
-service mysql restart > /dev/null
+service mysql stop > /dev/null
+service mysql start > /dev/null
 
 
 ###########

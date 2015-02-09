@@ -66,8 +66,8 @@ if [ ! -f /usr/bin/phpcpd ];
   then
     echo "[BOOTSTRAP] PHP Copy/Paste Detector doesn't exitsts. Installing..."
     curl -sLo phpcpd.phar https://phar.phpunit.de/phpcpd.phar
-    chmod +x phpcpd.phar
-    mv phpcpd.phar /usr/local/bin/phpcpd
+    sudo chmod +x phpcpd.phar
+    sudo mv phpcpd.phar /usr/local/bin/phpcpd
   else
     echo "[BOOTSTRAP] PHP Copy/Paste Detector has already been installed. Skipping..."
 fi
@@ -78,9 +78,9 @@ fi
 #####################
 
 echo "[BOOTSTRAP] Installing PHP Mess Detector..."
-sudo pear channel-discover pear.phpmd.org
-sudo pear channel-discover pear.pdepend.org
-sudo pear install --alldeps phpmd/PHP_PMD
+sudo pear channel-discover pear.phpmd.org > /dev/null
+sudo pear channel-discover pear.pdepend.org > /dev/null
+sudo pear install --alldeps phpmd/PHP_PMD > /dev/null
 
 # ie.
 # phpmd /path/to/source_file.php text codesize,unusedcode,naming
@@ -93,7 +93,7 @@ echo "[BOOTSTRAP] Checking if PHP_CodeSniffer has already been installed..."
 if [ ! -f /usr/bin/phpcs ];
   then
     echo "[BOOTSTRAP] PHP_CodeSniffer doesn't exitsts. Installing..."
-    sudo pear install PHP_CodeSniffer
+    sudo pear install PHP_CodeSniffer > /dev/null
   else
     echo "[BOOTSTRAP] PHP_CodeSniffer has already been installed. Skipping..."
 fi
@@ -122,8 +122,8 @@ echo "[BOOTSTRAP] Checking if Oh My Zsh has already been installed..."
 if [ ! -f ~/.oh-my-zsh ];
   then
     echo "[BOOTSTRAP] Oh My Zsh doesn't exitsts. Installing..."
-        curl -L http://install.ohmyz.sh | sed -n '/chsh/!p' | sed -n '/env zsh/!p' | sed -n '/^\. ~\/\.zshrc/!p' > /tmp/oh-my-zsh-install.sh
-        sh /tmp/oh-my-zsh-install.sh
+        curl -Ls http://install.ohmyz.sh | sed -n '/chsh/!p' | sed -n '/env zsh/!p' | sed -n '/^\. ~\/\.zshrc/!p' > /tmp/oh-my-zsh-install.sh
+        sh /tmp/oh-my-zsh-install.sh > /dev/null
         rm /tmp/oh-my-zsh-install.sh 
         sudo chsh -s $(which zsh) `whoami`
   else
@@ -139,7 +139,7 @@ echo "[BOOTSTRAP] Checking if n98-magerun has already been installed..."
 if [ ! -f /usr/local/bin/n98-magerun.phar ];
   then
     echo "[BOOTSTRAP] n98-magerun doesn't exitsts. Installing..."
-    curl -s -L -o n98-magerun.phar https://raw.githubusercontent.com/netz98/n98-magerun/master/n98-magerun.phar
+    curl -sLo n98-magerun.phar https://raw.githubusercontent.com/netz98/n98-magerun/master/n98-magerun.phar
     sudo chmod +x ./n98-magerun.phar
     sudo mv ./n98-magerun.phar /usr/local/bin/
   else
@@ -156,7 +156,7 @@ echo "[BOOTSTRAP] Checking if modgit has already been installed..."
 if [ ! -f /usr/local/bin/modgit ];
   then
     echo "[BOOTSTRAP] modgit doesn't exitsts. Installing..."
-    curl -s -L https://raw.github.com/jreinke/modgit/master/modgit > modgit
+    curl -sL https://raw.github.com/jreinke/modgit/master/modgit > modgit
     sudo chmod +x modgit
     sudo mv modgit /usr/local/bin
   else
@@ -173,7 +173,7 @@ echo "[BOOTSTRAP] Checking if modman has already been installed..."
 if [ ! -f /usr/local/bin/modman ];
   then
     echo "[BOOTSTRAP] modman doesn't exitsts. Installing..."
-    curl -s -L https://raw.githubusercontent.com/colinmollenhour/modman/master/modman -o modman
+    curl -sL https://raw.githubusercontent.com/colinmollenhour/modman/master/modman -o modman
     sudo chmod +x modman
     sudo mv modman /usr/local/bin
   else
@@ -192,7 +192,7 @@ if [ ! -f /usr/local/bin/symfony ];
     echo "[BOOTSTRAP] Symfony2 Installer doesn't exitsts. Installing..."
     curl -LsS http://symfony.com/installer > symfony.phar
     sudo mv symfony.phar /usr/local/bin/symfony
-    sudo chmod a+x /usr/local/bin/symfony
+    sudo chmod +x /usr/local/bin/symfony
   else
     echo "[BOOTSTRAP] Symfony2 Installer has already been installed. Skipping..."
 fi
@@ -207,8 +207,9 @@ echo "[BOOTSTRAP] Checking if PHP Coding Standards Fixer has already been instal
 if [ ! -f /usr/local/bin/php-cs-fixer ];
   then
     echo "[BOOTSTRAP] PHP Coding Standards Fixer doesn't exitsts. Installing..."
-    curl -LsS http://get.sensiolabs.org/php-cs-fixer.phar -o /usr/local/bin/php-cs-fixer
-    sudo chmod a+x /usr/local/bin/php-cs-fixer
+    curl -LsS http://get.sensiolabs.org/php-cs-fixer.phar > php-cs-fixer.phar
+	sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer
+    sudo chmod +x /usr/local/bin/php-cs-fixer
   else
     echo "[BOOTSTRAP] PHP Coding Standards Fixer has already been installed. Self-update..."
     php-cs-fixer self-update
@@ -224,8 +225,9 @@ echo "[BOOTSTRAP] Checking if PHP Coding Standards Fixer has already been instal
 if [ ! -f /usr/local/bin/pdepend ];
   then
     echo "[BOOTSTRAP] PHP Coding Standards Fixer doesn't exitsts. Installing..."
-    curl -LsS http://static.pdepend.org/php/latest/pdepend.phar -o /usr/local/bin/pdepend
-    sudo chmod a+x /usr/local/bin/pdepend
+    curl -LsS http://static.pdepend.org/php/latest/pdepend.phar > pdepend.phar
+	sudo mv pdepend.phar /usr/local/bin/pdepend
+    sudo chmod +x /usr/local/bin/pdepend
   else
     echo "[BOOTSTRAP] PHP Coding Standards Fixer has already been installed. Skipping..."
 fi
@@ -241,8 +243,9 @@ echo "[BOOTSTRAP] Checking if PHPLOC has already been installed..."
 if [ ! -f /usr/local/bin/phploc ];
   then
     echo "[BOOTSTRAP] PHPLOC doesn't exitsts. Installing..."
-    curl -LsS https://phar.phpunit.de/phploc.phar -o /usr/local/bin/phploc
-    sudo chmod a+x /usr/local/bin/phploc
+    curl -LsS https://phar.phpunit.de/phploc.phar > phploc.phar
+	sudo mv phploc.phar /usr/local/bin/phploc
+    sudo chmod +x /usr/local/bin/phploc
   else
     echo "[BOOTSTRAP] PHPLOC has already been installed. Skipping..."
 fi

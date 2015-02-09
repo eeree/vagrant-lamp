@@ -9,7 +9,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
   config.ssh.forward_agent = true
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-  config.vm.provision :shell, path: ".vagrant_bootstrap/bootstrap.sh", privileged: false
+  config.vm.provision :shell, path: ".vagrant_bootstrap/bootstrap_root.sh"
+  config.vm.provision :shell, path: ".vagrant_bootstrap/bootstrap_user.sh", privileged: false
   config.vm.provision :shell, run: "always", :path => ".vagrant_scripts/startup.sh", privileged: false
 
   config.vm.provider "virtualbox" do |vb|

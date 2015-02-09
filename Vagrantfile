@@ -9,8 +9,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
   config.ssh.forward_agent = true
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-  config.vm.provision :shell, path: ".vagrant_bootstrap/bootstrap.sh"
-  config.vm.provision :shell, run: "always", :path => ".vagrant_scripts/startup.sh"
+  config.vm.provision :shell, path: ".vagrant_bootstrap/bootstrap.sh", privileged: false
+  config.vm.provision :shell, run: "always", :path => ".vagrant_scripts/startup.sh", privileged: false
 
   config.vm.provider "virtualbox" do |vb|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 3306, host: 33060
 
   config.vm.network "private_network", ip: "192.168.56.101"
-
-  config.vm.synced_folder "C:/www", "/var/www/html"
+  config.vm.synced_folder "./www", "/var/www"
+  config.vm.synced_folder ".", "/vagrant"
 
 end

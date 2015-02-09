@@ -46,6 +46,28 @@ fi
 echo "[BOOTSTRAP] Installing PEAR..."
 sudo pear channel-update pear
 sudo pear upgrade pear
+sudo pear upgrade-all
+sudo pear config-set auto_discover 1
+
+
+###########
+# PHPUnit #
+###########
+
+echo "[BOOTSTRAP] Installing PHPUnit..."
+echo -e "${S}Installing PHPUnit and PHPDocumentor...${E}"
+sudo pear channel-update pear.php.net
+sudo pear install pear.phpunit.de/PHPUnit
+
+
+###########
+# phpDocumentor #
+###########
+
+echo "[BOOTSTRAP] Installing phpDocumentor..."
+sudo pear channel-discover pear.phpdoc.org
+sudo pear install phpdoc/phpDocumentor
+
 
 
 #########
@@ -54,7 +76,7 @@ sudo pear upgrade pear
 
 echo "[BOOTSTRAP] Installing Phing..."
 sudo pear channel-discover pear.phing.info
-sudo pear install phing/phing
+sudo pear install --alldeps phing/phing
 
 
 ###########################

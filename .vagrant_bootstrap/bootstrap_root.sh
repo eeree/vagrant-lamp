@@ -109,7 +109,7 @@ service apache2 restart
 ########
 
 echo "Setup PHP 5."
-apt-get install -y -qq php5 php5-gd php5-sqlite php5-pgsql php5-ldap php5-common php5-geoip php5-redis php5-imagick php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php-pear php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json php5-xdebug
+apt-get install -y -qq php5 php5-gd php5-sqlite php5-pgsql php5-ldap php5-common php5-geoip php5-redis php5-imagick php5-memcache php5-memcached  php5-mysql php5-xsl php5-curl php5-mcrypt php5-intl php5-cli php5-dev libapache2-mod-php5 php-apc php-pear php5-json php5-xdebug
 mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.bak
 cp -s /usr/share/php5/php.ini-development /etc/php5/apache2/php.ini
 sed -i 's#;date.timezone\([[:space:]]*\)=\([[:space:]]*\)*#date.timezone\1=\2\"'"$timezone"'\"#g' /etc/php5/apache2/php.ini
@@ -182,10 +182,18 @@ echo "[BOOTSTRAP] Creating a main database..."
 mysql -u root -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DEFAULT_DATABASE_NAME;"
 
 
-echo "[BOOTSTRAP] Restarting MySQL..."
+echo "[BOOTSTRAP] Stopping MySQL..."
 service mysql stop > /dev/null
-service mysql start > /dev/null
 
+echo "[BOOTSTRAP] MySQL stopped. Waiting to start again..."
+echo "[BOOTSTRAP] 3..."
+sleep 1
+echo "[BOOTSTRAP] 2..."
+sleep 1
+echo "[BOOTSTRAP] 1..."
+echo "[BOOTSTRAP] Restarting MySQL..."
+service mysql start > /dev/null
+echo "[BOOTSTRAP] MySQL started..."
 
 ###########
 # Postfix #

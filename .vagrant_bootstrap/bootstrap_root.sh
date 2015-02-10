@@ -71,6 +71,20 @@ echo "[BOOTSTRAP] Applying nasty fix to /apache2: Could not reliably determine t
 echo "ServerName $SERVER_NAME" >> /etc/apache2/apache2.conf
 
 
+echo "[BOOTSTRAP] Adding Apache2 a little more air, to speed up things..."
+PREFORK=$(cat <<EOF
+<IfModule prefork.c>
+    StartServers 2
+    MinSpareServers 6
+    MaxSpareServers 4
+    ServerLimit 4
+    MaxClients 4
+    MaxRequestsPerChild 3000
+</IfModule>
+EOF
+)
+echo "${PREFORK}" > /etc/apache2/apache2.conf
+
 echo "[BOOTSTRAP] Configuring overrides globally for Apache2..."
 rm -rf /var/www/html
 VHOST=$(cat <<EOF

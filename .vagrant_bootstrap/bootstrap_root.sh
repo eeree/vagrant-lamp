@@ -78,8 +78,8 @@ VHOST=$(cat <<EOF
   ServerName $SERVER_NAME
   ServerAlias $SERVER_ALIAS
   DocumentRoot /var/www
-  ErrorLog ${APACHE_LOG_DIR}/error.log
-  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  ErrorLog /var/log/apache2/error.log
+  CustomLog /var/log/apache2/access.log combined
   <Directory "/var/www">
     AllowOverride All
     Require all granted
@@ -182,17 +182,13 @@ echo "[BOOTSTRAP] Creating a main database..."
 mysql -u root -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DEFAULT_DATABASE_NAME;"
 
 
-echo "[BOOTSTRAP] Stopping MySQL..."
-service mysql stop > /dev/null
-
-echo "[BOOTSTRAP] MySQL stopped. Waiting to start again..."
+echo "[BOOTSTRAP] Restarting MySQL..."
 echo "[BOOTSTRAP] 3..."
 sleep 1
 echo "[BOOTSTRAP] 2..."
 sleep 1
 echo "[BOOTSTRAP] 1..."
-echo "[BOOTSTRAP] Restarting MySQL..."
-service mysql start > /dev/null
+service mysql restart > /dev/null
 echo "[BOOTSTRAP] MySQL started..."
 
 ###########
